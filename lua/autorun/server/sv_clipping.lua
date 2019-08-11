@@ -75,7 +75,7 @@ end
 
 function Clipping.RemoveClips( ent )
 	Clipping.EntityClips[ ent ] = nil 	
-
+	ent["EntityMods"]["clipping_all_prop_clips"] = nil
 	net.Start( "clipping_remove_all_clips" )
 		net.WriteEntity( ent )
 	net.Broadcast()
