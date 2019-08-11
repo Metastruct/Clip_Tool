@@ -115,6 +115,9 @@ function RenderOverride(self)
 	enabled = render_EnableClipping( true )
 
 	for i = 1 , self.MaxClips do
+		if !self then continue end
+		if !Clips[self] then continue end
+		if !Clips[self][i] then continue end
 		curclips = Clips[self][i]
 		n = ang_Forward( ent_LocalToWorldAngles(self , curclips[1] ) )
 		
