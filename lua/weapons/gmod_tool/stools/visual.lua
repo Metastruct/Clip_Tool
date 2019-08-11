@@ -264,6 +264,6 @@ if CLIENT then
 		--temp2:SetShouldDrawScreen(true)
 
 		pnl:AddControl("Button", {Label = "Reset",Command = "visual_reset"})	
-		pnl:AddControl("Slider", { Label = "Max Clips Per Prop", Type = "int", Min = "0", Max = "25", Command = "max_clips_per_prop" } )
+		--pnl:AddControl("Slider", { Label = "Max Clips Per Prop", Type = "int", Min = "0", Max = "25", Command = "max_clips_per_prop" } )
 	end
 end

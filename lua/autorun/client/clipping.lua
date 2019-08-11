@@ -3,7 +3,7 @@ local RenderOverride
 local RenderInside
 
 
-local cvar = CreateClientConVar("max_clips_per_prop" , 3 , true , false )
+local cvar = CreateClientConVar("max_clips_per_prop" , 7 , true , false )
 
 cvars.AddChangeCallback( "max_clips_per_prop" ,function(_,_,new)
 	new = tonumber(new)
