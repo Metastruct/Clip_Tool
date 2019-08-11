@@ -8,3 +8,6 @@
 - rolled the functionality of both tools into one.
 - added a Number Scratch (the blue ball thing) on the distance, pitch and yaw sliders, these allow you to go into extreme detail.
 - made clips undo-able
+
+--- REVIVAL - Aug 10, 2019
+- Comment out slider that lets you set max clips, because who would want less clips and you can't actually have over 7
