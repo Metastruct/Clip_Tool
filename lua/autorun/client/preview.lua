@@ -1,13 +1,13 @@
-local norm , d = Angle(0,0,0) , 0 
+local norm , d = Angle(0,0,0) , 0
 
 cvars.AddChangeCallback("visual_p",function(_,_,new)
-	norm.p = tonumber(new) or 0	
+	norm.p = tonumber(new) or 0
 end)
 cvars.AddChangeCallback("visual_y",function(_,_,new)
 	norm.y = tonumber(new) or 0
 end)
 cvars.AddChangeCallback("visual_distance",function(_,_,new)
-	d = tonumber(new) or 0	
+	d = tonumber(new) or 0
 end)
 
 
@@ -16,7 +16,7 @@ concommand.Add("visual_reset",function()
 	RunConsoleCommand("visual_y",0)
 	RunConsoleCommand("visual_distance",0)
 
-	d = 0 
+	d = 0
 	norm = Angle(0,0,0)
 end)
 
@@ -39,38 +39,50 @@ halfmodel2:SetNoDraw(true)
 local aiment
 local last
 
-local render=render
+local render_EnableClipping = render.EnableClipping
+local render_PushCustomClipPlane = render.PushCustomClipPlane
+local render_PopCustomClipPlane = render.PopCustomClipPlane
+local render_SetColorModulation = render.SetColorModulation
+
 local entm = FindMetaTable("Entity")
-local ent_SetNoDraw = entm.SetNoDraw 
-local ent_SetModel = entm.SetModel 
-local ent_GetModel = entm.GetModel 
-local ent_OBBCenter = entm.OBBCenter 
-local ent_SetPos = entm.SetPos 
-local ent_GetPos = entm.GetPos 
-local ent_SetAngles = entm.SetAngles 
-local ent_GetAngles = entm.GetAngles 
-local ent_LocalToWorldAngles = entm.LocalToWorldAngles 
-local ent_LocalToWorld = entm.LocalToWorld 
-local ent_DrawModel = entm.DrawModel 
+local ent_SetNoDraw = entm.SetNoDraw
+local ent_SetModel = entm.SetModel
+local ent_GetModel = entm.GetModel
+local ent_OBBCenter = entm.OBBCenter
+local ent_SetPos = entm.SetPos
+local ent_GetPos = entm.GetPos
+local ent_SetAngles = entm.SetAngles
+local ent_GetAngles = entm.GetAngles
+local ent_LocalToWorldAngles = entm.LocalToWorldAngles
+local ent_LocalToWorld = entm.LocalToWorld
+local ent_DrawModel = entm.DrawModel
+
 local gmod_toolmode
-local function PostDrawOpaqueRenderables()
-	gmod_toolmode = gmod_toolmode or GetConVar("gmod_toolmode")
-	if gmod_toolmode:GetString()~="visual" then return end
-	if not LocalPlayer():IsValid() or not LocalPlayer():GetActiveWeapon():IsValid() or LocalPlayer():GetActiveWeapon():GetClass() != "gmod_tool" then return end
-	aiment = LocalPlayer():GetEyeTraceNoCursor().Entity
+local function drawpreview()
+	gmod_toolmode=gmod_toolmode or GetConVar("gmod_toolmode")
+	if gmod_toolmode:GetString() ~= "visual" then
+		return
+	end
+
+	local pl = LocalPlayer()
+	aiment = pl:GetEyeTraceNoCursor().Entity
+	if not aiment:IsValid() then return end
+
+	local wep = pl:GetActiveWeapon()
+	if not wep:IsValid() or wep:GetClass() ~= "gmod_tool" or aiment:IsPlayer() then return end
+	
 
 	if IsValid(last) then
 		last:SetNoDraw(false)
 		last = nil
 	end
 
-	if !IsValid(LocalPlayer()) or !IsValid(aiment) then return end
-	 or aiment:IsPlayer() then return end		
+	if not IsValid(LocalPlayer()) or not IsValid(aiment) then return end
 
 	ent_SetNoDraw(aiment,true)
 
 	last = aiment
-	if ent_GetModel(halfmodel1) != ent_GetModel(aiment) then
+	if ent_GetModel(halfmodel1) ~= ent_GetModel(aiment) then
 		ent_SetModel(halfmodel1 , ent_GetModel(aiment))
 		ent_SetModel(halfmodel2 , ent_GetModel(aiment))
 	end
@@ -84,18 +96,18 @@ local function PostDrawOpaqueRenderables()
 	local n = -ent_LocalToWorldAngles(aiment , norm):Forward()
 
 
-	render.EnableClipping(true)
-	render.SetColorModulation(0,2,0)			
-	render.PushCustomClipPlane(-n, -n:Dot(e_pos-n*d) ) -- n , 
+	render_EnableClipping(true)
+	render_SetColorModulation(0,2,0)
+	render_PushCustomClipPlane(-n, -n:Dot(e_pos-n*d) ) -- n ,
 		ent_DrawModel(halfmodel2)
-	render.PopCustomClipPlane()	
+	render_PopCustomClipPlane()
 
-	render.SetColorModulation(2,0,0)			
-	render.PushCustomClipPlane(n, n:Dot(e_pos-n*d) ) -- n , 
+	render_SetColorModulation(2,0,0)
+	render_PushCustomClipPlane(n, n:Dot(e_pos-n*d) ) -- n ,
 		ent_DrawModel(halfmodel1)
-	render.PopCustomClipPlane()
-	render.SetColorModulation(1,1,1)		
-	render.EnableClipping(false)
+	render_PopCustomClipPlane()
+	render_SetColorModulation(1,1,1)
+	render_EnableClipping(false)
 	
 end
 

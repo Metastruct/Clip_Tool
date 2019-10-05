@@ -14,11 +14,16 @@ local function Check(ent)
 		if not RenderOverrideEnabled[eid] then
 			if ent.RenderOverride then
 				ent.ClipRenderOverride = RenderOverride
-				Msg"[CLip] " print("Colliding RenderOverride. Add compatibility manually for ",ent)
+				Msg"[Clip] " print("Colliding RenderOverride. Add compatibility manually for ",ent)
 				return
 			end
 			RenderOverrideEnabled[eid] = true
 			ent.RenderOverride = RenderOverride
+		else
+			if not ent.RenderOverride then
+				Msg"[Clip DBG] " print("Lost RenderOverride. Ent: ",ent)
+				ent.RenderOverride = RenderOverride
+			end
 		end
 	else
 		if RenderOverrideEnabled[eid] then
@@ -52,7 +57,7 @@ cvars.AddChangeCallback("max_clips_per_prop", function(_, _, new)
 	new = tonumber(new)
 
 	for ent, _ in pairs(Clips) do
-		ent.MaxClips = math.min(new, #Clips[ent])
+		MaxClips[ent] = math.min(new, #Clips[ent])
 	end
 end)
 
@@ -93,7 +98,9 @@ net.Receive(Tag, function()
 			AddPropClip(ent, ReadClip())
 		end
 	elseif mode == clipping_remove_all_clips then
-		table.Empty(Clips[ent])
+		if Clips[ent] then
+			table.Empty(Clips[ent])
+		end
 	elseif mode == clipping_remove_clip then
 		local index = net.ReadInt(16)
 		if not Clips[ent] then return end
@@ -150,7 +157,7 @@ RenderOverride = function(self)
 		render_CullMode(MATERIAL_CULLMODE_CCW)
 	end
 
-	for i = 1, self.MaxClips do
+	for i = 1, MaxClips[eid] do
 		render_PopCustomClipPlane()
 	end
 
