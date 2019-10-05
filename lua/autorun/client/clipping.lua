@@ -6,6 +6,16 @@ local MaxClips={}
 local RenderInsideInfo={}
 local RenderOverrideEnabled={}
 
+-- purely debug info. Do not use.
+if not Clipping then
+	Clipping = {}
+	Clipping.Clips = Clips
+	Clipping.RenderOverride = RenderOverride
+	Clipping.MaxClips = MaxClips
+	Clipping.RenderInsideInfo = RenderInsideInfo
+	Clipping.RenderOverrideEnabled = RenderOverrideEnabled
+end
+
 local function Check(ent)
 	local eid = ent:EntIndex()
 	local c = Clips[eid]
@@ -82,10 +92,17 @@ local clipping_all_prop_clips = 3
 local clipping_remove_all_clips = 4
 local clipping_remove_clip = 5
 
+local t={
+	"clipping_new_clip",
+	"clipping_render_inside",
+	"clipping_all_prop_clips",
+	"clipping_remove_all_clips",
+	"clipping_remove_clip"
+}
 net.Receive(Tag, function()
 	local mode = net.ReadUInt(5)
 	local ent = net.ReadUInt(16)
-	
+	Msg"[Clip Net] "print("mode=",t[mode] or mode,"entid=",ent,"ent=",Entity(ent),Clips[ent] and "<already something>" or "")
 
 	if mode == clipping_new_clip then
 		AddPropClip(ent, ReadClip())
