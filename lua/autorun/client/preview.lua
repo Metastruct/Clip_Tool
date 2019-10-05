@@ -39,11 +39,7 @@ halfmodel2:SetNoDraw(true)
 local aiment
 local last
 
-local render_EnableClipping = render.EnableClipping
-local render_PushCustomClipPlane = render.PushCustomClipPlane
-local render_PopCustomClipPlane = render.PopCustomClipPlane
-local render_SetColorModulation = render.SetColorModulation
-
+local render=render
 local entm = FindMetaTable("Entity")
 local ent_SetNoDraw = entm.SetNoDraw 
 local ent_SetModel = entm.SetModel 
@@ -56,8 +52,11 @@ local ent_GetAngles = entm.GetAngles
 local ent_LocalToWorldAngles = entm.LocalToWorldAngles 
 local ent_LocalToWorld = entm.LocalToWorld 
 local ent_DrawModel = entm.DrawModel 
-
-local function drawpreview()
+local gmod_toolmode
+local function PostDrawOpaqueRenderables()
+	gmod_toolmode = gmod_toolmode or GetConVar("gmod_toolmode")
+	if gmod_toolmode:GetString()~="visual" then return end
+	if not LocalPlayer():IsValid() or not LocalPlayer():GetActiveWeapon():IsValid() or LocalPlayer():GetActiveWeapon():GetClass() != "gmod_tool" then return end
 	aiment = LocalPlayer():GetEyeTraceNoCursor().Entity
 
 	if IsValid(last) then
@@ -66,7 +65,7 @@ local function drawpreview()
 	end
 
 	if !IsValid(LocalPlayer()) or !IsValid(aiment) then return end
-	if GetConVarString("gmod_toolmode") != "visual" or LocalPlayer():GetActiveWeapon():GetClass() != "gmod_tool" or aiment:IsPlayer() then return end		
+	 or aiment:IsPlayer() then return end		
 
 	ent_SetNoDraw(aiment,true)
 
@@ -85,18 +84,18 @@ local function drawpreview()
 	local n = -ent_LocalToWorldAngles(aiment , norm):Forward()
 
 
-	render_EnableClipping(true)
-	render_SetColorModulation(0,2,0)			
-	render_PushCustomClipPlane(-n, -n:Dot(e_pos-n*d) ) -- n , 
+	render.EnableClipping(true)
+	render.SetColorModulation(0,2,0)			
+	render.PushCustomClipPlane(-n, -n:Dot(e_pos-n*d) ) -- n , 
 		ent_DrawModel(halfmodel2)
-	render_PopCustomClipPlane()	
+	render.PopCustomClipPlane()	
 
-	render_SetColorModulation(2,0,0)			
-	render_PushCustomClipPlane(n, n:Dot(e_pos-n*d) ) -- n , 
+	render.SetColorModulation(2,0,0)			
+	render.PushCustomClipPlane(n, n:Dot(e_pos-n*d) ) -- n , 
 		ent_DrawModel(halfmodel1)
-	render_PopCustomClipPlane()
-	render_SetColorModulation(1,1,1)		
-	render_EnableClipping(false)
+	render.PopCustomClipPlane()
+	render.SetColorModulation(1,1,1)		
+	render.EnableClipping(false)
 	
 end
 
