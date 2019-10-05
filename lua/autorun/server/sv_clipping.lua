@@ -41,11 +41,22 @@ local function SendEntClip(ent, clip)
 end
 
 function Clipping.RenderInside(ent, enabled)
+	enabled = tobool(enabled)
+	
 	Clipping.RenderingInside[ent] = enabled
-	StartMsg(net_clipping_render_inside, ent)
-	net.WriteBit(tobool(enabled))
-	net.Broadcast()
+	Clipping.NetworkRenderInside(ent, enabled)
 	duplicator.StoreEntityModifier(ent, "clipping_render_inside", {enabled})
+end
+function Clipping.NetworkRenderInside(ent, enabled, pl)
+
+	enabled = tobool(enabled)
+	StartMsg(net_clipping_render_inside, ent)
+		net.WriteBool(tobool(enabled))
+	if pl then
+		net.Send(pl)
+	else
+		net.Broadcast()
+	end
 end
 
 function Clipping.GetRenderInside(ent)
@@ -75,7 +86,7 @@ function Clipping.NewClip(ent, clip)
 	SendEntClip(ent, clip)
 end
 
-function Clipping.SendAllPropClips(ent, player)
+function Clipping.SendAllPropClips(ent, pl)
 	StartMsg(net_clipping_all_prop_clips, ent)
 	net.WriteInt(#Clipping.EntityClips[ent], 16)
 
@@ -83,7 +94,12 @@ function Clipping.SendAllPropClips(ent, player)
 		WriteClip(clip)
 	end
 
-	net.Send(player)
+	net.Send(pl)
+	
+	if Clipping.RenderingInside[ent] then
+		Clipping.NetworkRenderInside(ent, true, pl)
+	end
+	
 end
 
 function Clipping.RemoveClips(ent, keepdata)

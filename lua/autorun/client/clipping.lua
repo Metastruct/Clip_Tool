@@ -107,7 +107,7 @@ net.Receive(Tag, function()
 	if mode == clipping_new_clip then
 		AddPropClip(ent, ReadClip())
 	elseif mode == clipping_render_inside then
-		local enabled = tobool(net.ReadBit())
+		local enabled = net.ReadBool()
 		RenderInsideInfo[ent] = enabled
 	elseif mode == clipping_all_prop_clips then
 		local clips = net.ReadInt(16)
