@@ -1,4 +1,4 @@
-Visal Clip Tool for Garry's Mod
+Visual Clip Tool for Garry's Mod
 ==============
 
 A tool for visually clipping entities.
