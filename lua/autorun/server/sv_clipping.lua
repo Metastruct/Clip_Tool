@@ -63,11 +63,17 @@ function Clipping.NewClip( ent , clip )
 end
 
 function Clipping.SendAllPropClips( ent , player )
+	local entclips = Clipping.EntityClips[ent]
+	if not entclips then return end
+	
+	local count = #entclips
+	if entclips < 1 then return end
+	
 	net.Start( "clipping_all_prop_clips" )
 		net.WriteEntity( ent )
-		net.WriteInt( #Clipping.EntityClips[ent] , 16 )
+		net.WriteInt( count, 16 )
 
-		for k , clip in pairs( Clipping.EntityClips[ent] ) do
+		for k , clip in pairs( entclips ) do
 			WriteClip( clip )
 		end
 	net.Send( player )
@@ -105,11 +111,16 @@ net.Receive("clipping_request_all_clips" , function(_,ply)
 end)
 
 hook.Add( "Think" , "Clipping_Send_All_Clips" , function()
-	if #Clipping.Queue > 0 then
-		Clipping.SendAllPropClips( Clipping.Queue[ #Clipping.Queue ][1] , Clipping.Queue[ #Clipping.Queue ][2] )
-
-		Clipping.Queue[ #Clipping.Queue ] = nil
-	end
+	if #Clipping.Queue < 1 then return end
+	
+	local clip = table.remove(Clipping.Queue, 1)
+	local ent = clip[1]
+	local ply = clip[2]
+	
+	if not ent or not ent:IsValid() then return end
+	if not ply or not ply:IsValid() then return end
+	
+	Clipping.SendAllPropClips(ent, ply)
 end)
 
 duplicator.RegisterEntityModifier( "clipping_all_prop_clips", function( p , ent , data)
