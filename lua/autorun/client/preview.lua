@@ -61,6 +61,11 @@ local function drawpreview()
 	local lp = LocalPlayer()
 	if not lp or not lp:IsValid() then return end
 	
+	if last and last:IsValid() then
+		last:SetNoDraw(false)
+		last = nil
+	end
+	
 	local aiment = lp:GetEyeTraceNoCursor().Entity
 	if not aiment or not aiment:IsValid() or aiment:IsPlayer() then return end
 	
@@ -68,11 +73,6 @@ local function drawpreview()
 	if not wep or not wep:IsValid() then return end
 	
 	if GetConVarString("gmod_toolmode") ~= "visual" or wep:GetClass() ~= "gmod_tool" then return end
-	
-	if last and last:IsValid() then
-		last:SetNoDraw(false)
-		last = nil
-	end
 	
 	ent_SetNoDraw(aiment,true)
 
