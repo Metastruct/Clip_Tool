@@ -59,24 +59,22 @@ local ent_DrawModel = entm.DrawModel
 
 local gmod_toolmode
 local function drawpreview()
+	local lp = LocalPlayer()
+	if not lp or not lp:IsValid() then return end
 	
-	
-	if last and IsValid(last) then
+	if last and last:IsValid() then
 		last:SetNoDraw(false)
 		last = nil
 	end
 	
-	gmod_toolmode=gmod_toolmode or GetConVar("gmod_toolmode")
-	if gmod_toolmode:GetString() ~= "visual" then
-		return
-	end
-
-	local pl = LocalPlayer()
-	aiment = pl:GetEyeTraceNoCursor().Entity
-	if not aiment:IsValid() then return end
-
-	local wep = pl:GetActiveWeapon()
-	if not wep:IsValid() or wep:GetClass() ~= "gmod_tool" or aiment:IsPlayer() then return end
+	local aiment = lp:GetEyeTraceNoCursor().Entity
+	if not aiment or not aiment:IsValid() or aiment:IsPlayer() then return end
+	
+	local wep = lp:GetActiveWeapon()
+	if not wep or not wep:IsValid() then return end
+	
+	if GetConVarString("gmod_toolmode") ~= "visual" or wep:GetClass() ~= "gmod_tool" then return end
+	
 	
 
 

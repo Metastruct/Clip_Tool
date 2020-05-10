@@ -134,11 +134,17 @@ net.Receive(Tag, function(_, ply)
 	end
 end)
 
-hook.Add("Tick", "Clipping_Send_All_Clips", function()
-	if not next(Clipping.Queue) then return end
-	local q = Clipping.Queue[#Clipping.Queue]
-	Clipping.SendAllPropClips(q[1], q[2])
-	Clipping.Queue[#Clipping.Queue] = nil
+hook.Add( "Think" , "Clipping_Send_All_Clips" , function()
+	if #Clipping.Queue < 1 then return end
+	
+	local clip = table.remove(Clipping.Queue, 1)
+	local ent = clip[1]
+	local ply = clip[2]
+	
+	if not ent or not ent:IsValid() then return end
+	if not ply or not ply:IsValid() then return end
+	
+	Clipping.SendAllPropClips(ent, ply)
 end)
 
 duplicator.RegisterEntityModifier("clipping_all_prop_clips", function(p, ent, data)
